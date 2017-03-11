@@ -166,8 +166,15 @@ function redraw {
 }
 
 if [ $# -ne 2 ]; then
-  echo "Not enough arguments"
-  echo "Usage: $0 host-of-opponent port"
+  if [ $# -eq 1 ] && ([ $1 == "--help" ] || [ $1 == "-h" ]); then
+    echo "$0"
+    echo "Commands: xy"
+    echo "1 <= x <= 3"
+    echo "2 <= y <= 3"
+  else
+    echo "Not enough arguments"
+    echo "Usage: $0 host-of-opponent port"
+  fi
   exit 1
 fi
 
