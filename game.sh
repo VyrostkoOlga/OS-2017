@@ -26,7 +26,6 @@ function NetListen {
 
 function fromNet {
   code=$(NetListen)
-  echo $code
   if [ $code == $mark ]; then
     connected=1
     return
@@ -193,7 +192,6 @@ redraw
 current_turn=0
 while [ true ]; do
   checkIfGameOver
-  echo $allOccupied
   if [ $allOccupied == 1 ]; then
     echo "No possible turns"
     break
