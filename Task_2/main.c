@@ -89,7 +89,7 @@ int main(int argc, const char * argv[]) {
     
     if (argc < 2) {
         printf("Not enough arguments\n");
-        printf("Usage: %s filename\n", argv[0]);
+        printf("Usage: input | %s filename\n", argv[0]);
         return ERROR_CODE_NOT_ENOUGH_ARGUMENTS;
     }
     
