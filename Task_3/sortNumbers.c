@@ -42,7 +42,7 @@ struct Node {
 
 // Create Node and initialize it with number
 // returns NULL if there is memory error
-struct Node* createNode(long number) {
+struct Node* createNode(float number) {
     struct Node* newN = malloc(sizeof(struct Node));
     if (!newN) {
         printf("Failed to allocate memory");
@@ -54,7 +54,7 @@ struct Node* createNode(long number) {
 
 // Insert Node to list (if list already has a head and new node should not be a head)
 // Find a place to a new node according to its number (should be less than prev node's number)
-int insertNode(struct Node *head, long number) {
+int insertNode(struct Node *head, float number) {
     struct Node* newN = malloc(sizeof(struct Node));
     if (!newN) {
         printf("Failed to allocate memory");
@@ -103,7 +103,7 @@ int writeListToFile(const char *filename, struct Node* head) {
                 return WRITE_LIST_TO_FILE_ERROR_FILE_OP;
             }
         } else {
-            if (fprintf(fd, "%.02f\n", current->number) < 0) {
+            if (fprintf(fd, "%f\n", current->number) < 0) {
                 return WRITE_LIST_TO_FILE_ERROR_FILE_OP;
             }
         }
