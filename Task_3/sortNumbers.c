@@ -9,7 +9,13 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <math.h>
+
+static const short SHORT_HELP_LEN = 2;
+static const char SHORT_HELP[SHORT_HELP_LEN] = "-h";
+static const short LONG_HELP_LEN = 6;
+static const char LONG_HELP[LONG_HELP_LEN] = "--help";
 
 enum INSERT_NODE_ERROR_CODES {
     INSERT_NODE_ERROR_OK = 0,
@@ -95,6 +101,11 @@ int writeListToFile(const char *filename, struct Node* head) {
 }
 
 void freeList(struct Node* head) {
+    if (head->next == head) {
+        free(head);
+        return;
+    }
+    
     struct Node *current = head;
     struct Node *next = head->next;
     while (next) {
@@ -105,7 +116,37 @@ void freeList(struct Node* head) {
     free(current);
 }
 
+bool checkIfArgShortHelp(const char* arg) {
+    int idx = 0;
+    while ((arg[idx] != '\0') && (idx < SHORT_HELP_LEN)) {
+        if (arg[idx] != SHORT_HELP[idx]) {
+            return false;
+        }
+        idx++;
+    }
+    return true;
+}
+
+int checkIfArgLongHelp(const char* arg) {
+    int idx = 0;
+    while ((arg[idx] != '\0') && (idx < LONG_HELP_LEN)) {
+        if (arg[idx] != LONG_HELP[idx]) {
+            return false;
+        }
+        idx++;
+    }
+    return true;
+}
+
 int main(int argc, const char * argv[]) {
+    
+    if (argc == 2) {
+        if ((checkIfArgShortHelp(argv[1])) || (checkIfArgLongHelp(argv[1]))) {
+            printf("Usage: ./sortNumbers [<input_file>...]\n");
+            printf("Last input file will also be an output file\n");
+            return ERROR_CODE_OK;
+        }
+    }
     
     struct Node *head = malloc(sizeof(struct Node));
     if (!head) {
