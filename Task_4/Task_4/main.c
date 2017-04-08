@@ -10,6 +10,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <unistd.h>
 
 enum INIT_FIELD_ERROR_CODES {
     INIT_FIELD_ERROR_OK = 0,
@@ -50,7 +51,9 @@ void modifyRow(const unsigned char *fieldRow, unsigned char *currentRow, unsigne
     }
 }
 
-int nextState(unsigned char *field) {
+int nextState(unsigned char *field, bool *finished) {
+    sleep(1);
+    
     unsigned char nextStateField[FIELD_SIZE];
     int liveNear;
     unsigned char mask, shiftColumn;
@@ -86,6 +89,8 @@ int nextState(unsigned char *field) {
     for (unsigned short row = 0; row < FIELD_SIZE; row++) {
         field[row] = nextStateField[row];
     }
+    
+    *finished = true;
     return 0;
 }
 
@@ -151,16 +156,28 @@ void printField(unsigned char *field) {
     }
 }
 
+void stopNextState(int sig) {
+    printf("Error: next state is not counted after 1 second");
+    exit(-1);
+}
+
 int main(int argc, const char * argv[]) {
+    signal(SIGALRM, stopNextState);
+    
     unsigned char field[FIELD_SIZE];
+    bool finished;
     
     if (initField("/Users/OlgaVyrostko/Documents/WorkMaterials/8sem/ОС/game/Task_4/Task_4/field", field) != INIT_FIELD_ERROR_OK) {
         return -1;
     }
-    printField(field);
-    nextState(field);
-    printf("New\n");
-    printField(field);
+    
+    while (true) {
+        finished = false;
+        alarm(1);
+        nextState(field, &finished);
+        printField(field);
+        printf("Next\n");
+    }
     
     return 0;
 }
