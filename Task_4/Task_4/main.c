@@ -25,10 +25,11 @@ enum ERROR_CODES {
     ERROR_CODE_OK = 0,
     ERROR_CODE_INIT_FIELD_ERROR,
     ERROR_CODE_SOCKET_ERROR,
-    
+    ERROR_CODE_INTERRUPTION_ERROR,
+    ERROR_CODE_THREAD_ERROR
 };
 
-static const unsigned short FIELD_SIZE = 4;
+static const unsigned short FIELD_SIZE = 8;
 
 static const unsigned char ONE_BIT = 1;
 static const unsigned char TWO_BITS = 3;
@@ -38,6 +39,7 @@ static const unsigned short STAY_ALIVE[2] = {2, 3};
 static const unsigned short MAKE_ALIVE = 3;
 
 static const int PORT = 8889;
+static const unsigned short INTERRUPTION_INTERVAL = 1;
 
 unsigned char field[FIELD_SIZE];
 int socket_desc;
@@ -176,12 +178,12 @@ void stopNextState(int sig) {
         printf("Could not close server socket\n");
     }
     
-    exit(-1);
+    exit(ERROR_CODE_INTERRUPTION_ERROR);
 }
 
 void* processGame() {
     while (true) {
-        alarm(1);
+        alarm(INTERRUPTION_INTERVAL);
         nextState(field);
     }
 }
@@ -190,13 +192,13 @@ int main(int argc, const char * argv[]) {
     signal(SIGALRM, stopNextState);
     
     if (initField("/Users/OlgaVyrostko/Documents/WorkMaterials/8sem/ОС/game/Task_4/Task_4/field", field) != INIT_FIELD_ERROR_OK) {
-        return -1;
+        return ERROR_CODE_INIT_FIELD_ERROR;
     }
     
     pthread_t gameId;
     if (pthread_create(&gameId, NULL, processGame, NULL)) {
         printf("Error creating game thread");
-        return -1;
+        return ERROR_CODE_THREAD_ERROR;
     }
     
     int client_sock, c;
@@ -205,7 +207,7 @@ int main(int argc, const char * argv[]) {
     socket_desc = socket(AF_INET, SOCK_STREAM, 0);
     if (socket_desc == -1) {
         printf("Could not create socket\n");
-        return -1;
+        return ERROR_CODE_SOCKET_ERROR;
     }
     
     server.sin_family = AF_INET;
@@ -214,12 +216,12 @@ int main(int argc, const char * argv[]) {
     
     if (bind(socket_desc,(struct sockaddr *)&server , sizeof(server)) < 0) {
         printf("Could not bind\n");
-        return -1;
+        return ERROR_CODE_SOCKET_ERROR;
     }
     
     if (listen(socket_desc, 10) < 0) {
         printf("Could not listen\n");
-        return -1;
+        return ERROR_CODE_SOCKET_ERROR;
     }
     
     while ((client_sock = accept(socket_desc, (struct sockaddr *) &client, (socklen_t*)&c)) >= 0) {
@@ -233,8 +235,8 @@ int main(int argc, const char * argv[]) {
     
     if (close(socket_desc) < 0) {
         printf("Could not close server socket\n");
-        return -1;
+        return ERROR_CODE_SOCKET_ERROR;
     }
     
-    return 0;
+    return ERROR_CODE_OK;
 }
