@@ -12,11 +12,20 @@
 #include <ctype.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
 
 enum INIT_FIELD_ERROR_CODES {
     INIT_FIELD_ERROR_OK = 0,
     INIT_FIELD_FILE_ERROR,
     INIT_FIELD_WRONG_INPUT
+};
+
+enum ERROR_CODES {
+    ERROR_CODE_OK = 0,
+    ERROR_CODE_INIT_FIELD_ERROR,
+    ERROR_CODE_SOCKET_ERROR,
+    
 };
 
 static const unsigned short FIELD_SIZE = 4;
@@ -28,7 +37,10 @@ static const unsigned char THREE_BITS = 7;
 static const unsigned short STAY_ALIVE[2] = {2, 3};
 static const unsigned short MAKE_ALIVE = 3;
 
+static const int PORT = 8889;
+
 unsigned char field[FIELD_SIZE];
+int socket_desc;
 
 int countLiveNear(unsigned char mask) {
     switch (mask) {
@@ -160,6 +172,10 @@ void printField(unsigned char *field) {
 
 void stopNextState(int sig) {
     printf("Error: next state is not counted after 1 second");
+    if (close(socket_desc) < 0) {
+        printf("Could not close server socket\n");
+    }
+    
     exit(-1);
 }
 
@@ -167,8 +183,6 @@ void* processGame() {
     while (true) {
         alarm(1);
         nextState(field);
-        printField(field);
-        printf("Next\n");
     }
 }
 
@@ -185,7 +199,42 @@ int main(int argc, const char * argv[]) {
         return -1;
     }
     
-    while (true) {}
+    int client_sock, c;
+    struct sockaddr_in server, client;
+    
+    socket_desc = socket(AF_INET, SOCK_STREAM, 0);
+    if (socket_desc == -1) {
+        printf("Could not create socket\n");
+        return -1;
+    }
+    
+    server.sin_family = AF_INET;
+    server.sin_addr.s_addr = INADDR_ANY;
+    server.sin_port = htons(PORT);
+    
+    if (bind(socket_desc,(struct sockaddr *)&server , sizeof(server)) < 0) {
+        printf("Could not bind\n");
+        return -1;
+    }
+    
+    if (listen(socket_desc, 10) < 0) {
+        printf("Could not listen\n");
+        return -1;
+    }
+    
+    while ((client_sock = accept(socket_desc, (struct sockaddr *) &client, (socklen_t*)&c)) >= 0) {
+        if (send(client_sock, field, FIELD_SIZE * FIELD_SIZE, 0) < 0) {
+            printf("Could not write to client\n");
+        }
+        if (close(client_sock) < 0) {
+            printf("Could not close connection with client\n");
+        }
+    }
+    
+    if (close(socket_desc) < 0) {
+        printf("Could not close server socket\n");
+        return -1;
+    }
     
     return 0;
 }
