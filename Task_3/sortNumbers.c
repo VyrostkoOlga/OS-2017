@@ -88,6 +88,7 @@ void printList(struct Node* head) {
 // Write list of numbers to a file
 int writeListToFile(const char *filename, struct Node* head) {
     if ((!head) || (head->next == head)) {
+        printf("No numbers found: last file contents won't be overwriten\n");
         return WRITE_LIST_TO_FILE_ERROR_EMPT_LIST;
     }
     
