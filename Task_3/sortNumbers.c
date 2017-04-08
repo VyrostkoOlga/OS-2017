@@ -34,11 +34,14 @@ enum ERROR_CODES {
     ERROR_CODE_FILE_OP_ERROR
 };
 
+// Node of numbers list
 struct Node {
-    float number;
-    struct Node* next;
+    float number;                   // number read from file
+    struct Node* next;              // reference to next node
 };
 
+// Create Node and initialize it with number
+// returns NULL if there is memory error
 struct Node* createNode(long number) {
     struct Node* newN = malloc(sizeof(struct Node));
     if (!newN) {
@@ -49,6 +52,8 @@ struct Node* createNode(long number) {
     return newN;
 }
 
+// Insert Node to list (if list already has a head and new node should not be a head)
+// Find a place to a new node according to its number (should be less than prev node's number)
 int insertNode(struct Node *head, long number) {
     struct Node* newN = malloc(sizeof(struct Node));
     if (!newN) {
@@ -67,6 +72,7 @@ int insertNode(struct Node *head, long number) {
     return INSERT_NODE_ERROR_OK;
 }
 
+// Print nodes' list to a standart output (for debug)
 void printList(struct Node* head) {
     struct Node* current = head;
     if ((!head) || (current->next == current)) {
@@ -79,6 +85,7 @@ void printList(struct Node* head) {
     }
 }
 
+// Write list of numbers to a file
 int writeListToFile(const char *filename, struct Node* head) {
     if ((!head) || (head->next == head)) {
         return WRITE_LIST_TO_FILE_ERROR_EMPT_LIST;
@@ -100,6 +107,8 @@ int writeListToFile(const char *filename, struct Node* head) {
     return WRITE_LIST_TO_FILE_ERROR_OK;
 }
 
+// Free list of numbers (from head to last node)
+// Should be called when returns from main function even if exit because of error
 void freeList(struct Node* head) {
     if (head->next == head) {
         free(head);
@@ -116,6 +125,7 @@ void freeList(struct Node* head) {
     free(current);
 }
 
+// Check if the second argument == "-h" and need to print help
 bool checkIfArgShortHelp(const char* arg) {
     int idx = 0;
     while ((arg[idx] != '\0') && (idx < SHORT_HELP_LEN)) {
@@ -127,6 +137,7 @@ bool checkIfArgShortHelp(const char* arg) {
     return true;
 }
 
+// Check if the second argument == "--help" and need to print help
 int checkIfArgLongHelp(const char* arg) {
     int idx = 0;
     while ((arg[idx] != '\0') && (idx < LONG_HELP_LEN)) {
