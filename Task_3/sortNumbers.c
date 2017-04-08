@@ -98,9 +98,16 @@ int writeListToFile(const char *filename, struct Node* head) {
     
     struct Node* current = head;
     while (current) {
-        if (fprintf(fd, "%.02f\n", current->number) < 0) {
-            return WRITE_LIST_TO_FILE_ERROR_FILE_OP;
+        if (((long)current->number) == current->number) {
+            if (fprintf(fd, "%ld\n", (long)current->number) < 0) {
+                return WRITE_LIST_TO_FILE_ERROR_FILE_OP;
+            }
+        } else {
+            if (fprintf(fd, "%.02f\n", current->number) < 0) {
+                return WRITE_LIST_TO_FILE_ERROR_FILE_OP;
+            }
         }
+        
         current = current->next;
     }
     
