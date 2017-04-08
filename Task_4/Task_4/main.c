@@ -17,7 +17,7 @@ enum INIT_FIELD_ERROR_CODES {
     INIT_FIELD_WRONG_INPUT
 };
 
-static const unsigned short FIELD_SIZE = 8;
+static const unsigned short FIELD_SIZE = 4;
 
 static const unsigned char ONE_BIT = 1;
 static const unsigned char TWO_BITS = 3;
@@ -43,38 +43,44 @@ int countLiveNear(unsigned char mask) {
 void modifyRow(const unsigned char *fieldRow, unsigned char *currentRow, unsigned short column, int liveNear) {
     if (*fieldRow & (ONE_BIT << column)) {
         if ((liveNear == STAY_ALIVE[0]) || (liveNear == STAY_ALIVE[1])) {
-            *currentRow |= ONE_BIT;
+            *currentRow |= (ONE_BIT << column);
         }
     } else if (liveNear == MAKE_ALIVE) {
-        *currentRow |= ONE_BIT;
+        *currentRow |= (ONE_BIT << column);
     }
 }
 
 int nextState(unsigned char *field) {
     unsigned char nextStateField[FIELD_SIZE];
-    
     int liveNear;
-    unsigned char currentRow = 0;
+    unsigned char mask, shiftColumn;
     
-    // 0 row
-    liveNear = ((field[0] & (ONE_BIT << 1)) >> 1);
-    liveNear += countLiveNear(field[1] & TWO_BITS);
-    modifyRow(&field[0], &currentRow, 0, liveNear);
-    
-    for (unsigned short row = 1; row < FIELD_SIZE - 1; row++) {
-        currentRow = 0;
-        
-        // 0 column
-        liveNear = countLiveNear(field[row - 1] & TWO_BITS);
-        liveNear += ((field[row] & (ONE_BIT << 1)) >> 1);
-        liveNear += countLiveNear(field[row + 1] & TWO_BITS);
-        modifyRow(&field[row], &currentRow, 0, liveNear);
-        
-        for (unsigned short column = 1; column < FIELD_SIZE - 1; column++) {
+    for (unsigned short row = 0; row < FIELD_SIZE; row++) {
+        nextStateField[row] ^= nextStateField[row];
+        for (unsigned short column = 0; column < FIELD_SIZE; column++) {
+            if (!column) {
+                mask = TWO_BITS;
+                shiftColumn = 0;
+            } else if (column == FIELD_SIZE - 1) {
+                mask = TWO_BITS;
+                shiftColumn = -1;
+            } else {
+                mask = THREE_BITS;
+                shiftColumn = -1;
+            }
             
+            liveNear = row ? countLiveNear((field[row - 1] & (mask << (column + shiftColumn))) >> (column + shiftColumn)) : 0;
+            if (column) {
+                liveNear += ((field[row] & (ONE_BIT << (column - 1))) >> (column - 1));
+            }
+            if (column != FIELD_SIZE - 1) {
+                liveNear += ((field[row] & (ONE_BIT << (column + 1))) >> (column + 1));
+            }
+            if (row != FIELD_SIZE - 1) {
+                liveNear += countLiveNear((field[row + 1] & (mask << (column + shiftColumn))) >> (column + shiftColumn));
+            }
+            modifyRow(&field[row], &nextStateField[row], column, liveNear);
         }
-        
-        // last column
     }
     
     for (unsigned short row = 0; row < FIELD_SIZE; row++) {
