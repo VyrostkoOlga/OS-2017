@@ -58,6 +58,7 @@ int countLiveNear(unsigned char mask) {
     }
 }
 
+// modify field row for cell at column according to alive neighbours and alive state
 void modifyRow(const unsigned char *fieldRow, unsigned char *currentRow, unsigned short column, int liveNear) {
     if (*fieldRow & (ONE_BIT << column)) {
         if ((liveNear == STAY_ALIVE[0]) || (liveNear == STAY_ALIVE[1])) {
@@ -68,6 +69,7 @@ void modifyRow(const unsigned char *fieldRow, unsigned char *currentRow, unsigne
     }
 }
 
+// count next state of the game
 int nextState(unsigned char *field) {
     //sleep(1);
     
@@ -110,6 +112,7 @@ int nextState(unsigned char *field) {
     return 0;
 }
 
+// read first game state from file if possible
 int initField(const char *filename, unsigned char* field) {
     FILE *fd = fopen(filename, "r");
     if (!fd) {
@@ -163,6 +166,7 @@ int initField(const char *filename, unsigned char* field) {
     return INIT_FIELD_ERROR_OK;
 }
 
+// print field (on server for debug)
 void printField(unsigned char *field) {
     for (unsigned short row = 0; row < FIELD_SIZE; row++) {
         for (unsigned short column = 0; column < FIELD_SIZE; column++) {
@@ -172,6 +176,7 @@ void printField(unsigned char *field) {
     }
 }
 
+// interruption handler (stop game because computation is longer than necessary)
 void stopNextState(int sig) {
     printf("Error: next state is not counted after 1 second");
     if (close(socket_desc) < 0) {
@@ -181,6 +186,7 @@ void stopNextState(int sig) {
     exit(ERROR_CODE_INTERRUPTION_ERROR);
 }
 
+// infinite game loop (function for server background thread)
 void* processGame() {
     while (true) {
         alarm(INTERRUPTION_INTERVAL);
@@ -189,9 +195,19 @@ void* processGame() {
 }
 
 int main(int argc, const char * argv[]) {
+    if (argc < 2) {
+        printf("Not enough arguments\n");
+        printf("Usage: ./main <file_with_initial_state>\n");
+        printf("Initial state format: 8 rows of 8 elements, each row from new line\n");
+        printf("0 = dead, 1 = live\n");
+        printf("There shoud not be any symbols except 0, 1 and one \\n at the end of the line\n");
+        return ERROR_CODE_OK;
+    }
+    
+    // set alarm handler
     signal(SIGALRM, stopNextState);
     
-    if (initField("/Users/OlgaVyrostko/Documents/WorkMaterials/8sem/ОС/game/Task_4/Task_4/field", field) != INIT_FIELD_ERROR_OK) {
+    if (initField(argv[1], field) != INIT_FIELD_ERROR_OK) {
         return ERROR_CODE_INIT_FIELD_ERROR;
     }
     
