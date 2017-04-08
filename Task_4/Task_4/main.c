@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <unistd.h>
+#include <pthread.h>
 
 enum INIT_FIELD_ERROR_CODES {
     INIT_FIELD_ERROR_OK = 0,
@@ -26,6 +27,8 @@ static const unsigned char THREE_BITS = 7;
 
 static const unsigned short STAY_ALIVE[2] = {2, 3};
 static const unsigned short MAKE_ALIVE = 3;
+
+unsigned char field[FIELD_SIZE];
 
 int countLiveNear(unsigned char mask) {
     switch (mask) {
@@ -51,8 +54,8 @@ void modifyRow(const unsigned char *fieldRow, unsigned char *currentRow, unsigne
     }
 }
 
-int nextState(unsigned char *field, bool *finished) {
-    sleep(1);
+int nextState(unsigned char *field) {
+    //sleep(1);
     
     unsigned char nextStateField[FIELD_SIZE];
     int liveNear;
@@ -90,7 +93,6 @@ int nextState(unsigned char *field, bool *finished) {
         field[row] = nextStateField[row];
     }
     
-    *finished = true;
     return 0;
 }
 
@@ -161,23 +163,29 @@ void stopNextState(int sig) {
     exit(-1);
 }
 
+void* processGame() {
+    while (true) {
+        alarm(1);
+        nextState(field);
+        printField(field);
+        printf("Next\n");
+    }
+}
+
 int main(int argc, const char * argv[]) {
     signal(SIGALRM, stopNextState);
-    
-    unsigned char field[FIELD_SIZE];
-    bool finished;
     
     if (initField("/Users/OlgaVyrostko/Documents/WorkMaterials/8sem/ОС/game/Task_4/Task_4/field", field) != INIT_FIELD_ERROR_OK) {
         return -1;
     }
     
-    while (true) {
-        finished = false;
-        alarm(1);
-        nextState(field, &finished);
-        printField(field);
-        printf("Next\n");
+    pthread_t gameId;
+    if (pthread_create(&gameId, NULL, processGame, NULL)) {
+        printf("Error creating game thread");
+        return -1;
     }
+    
+    while (true) {}
     
     return 0;
 }
