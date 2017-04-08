@@ -207,16 +207,19 @@ int main(int argc, const char * argv[]) {
     // set alarm handler
     signal(SIGALRM, stopNextState);
     
+    // get initial state from file passed as the first non-preset command line argument
     if (initField(argv[1], field) != INIT_FIELD_ERROR_OK) {
         return ERROR_CODE_INIT_FIELD_ERROR;
     }
     
+    // start game thread
     pthread_t gameId;
     if (pthread_create(&gameId, NULL, processGame, NULL)) {
         printf("Error creating game thread");
         return ERROR_CODE_THREAD_ERROR;
     }
     
+    // listen to clients' connections
     int client_sock, c;
     struct sockaddr_in server, client;
     

@@ -19,6 +19,7 @@ enum ERROR_CODES {
     ERROR_CODE_SOCKET_ERROR
 };
 
+// print field (for client)
 void printField(unsigned char *field) {
     for (unsigned short row = 0; row < FIELD_SIZE; row++) {
         for (unsigned short column = 0; column < FIELD_SIZE; column++) {
@@ -29,6 +30,8 @@ void printField(unsigned char *field) {
 }
 
 int main(int argc, const char * argv[]) {
+    // connect to the server and get current life game's state
+    
     int sock;
     struct sockaddr_in server;
     unsigned char field[FIELD_SIZE * FIELD_SIZE];
