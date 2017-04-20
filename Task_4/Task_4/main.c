@@ -42,6 +42,7 @@ static const int PORT = 8889;
 static const unsigned short INTERRUPTION_INTERVAL = 1;
 
 unsigned char field[FIELD_SIZE];
+bool finished;
 int socket_desc;
 
 int countLiveNear(unsigned char mask) {
@@ -109,6 +110,7 @@ int nextState(unsigned char *field) {
         field[row] = nextStateField[row];
     }
     
+    finished = true;
     return 0;
 }
 
@@ -178,22 +180,30 @@ void printField(unsigned char *field) {
 
 // interruption handler (stop game because computation is longer than necessary)
 void stopNextState(int sig) {
-    printf("Error: next state is not counted after 1 second");
-    if (close(socket_desc) < 0) {
-        printf("Could not close server socket\n");
+    if (!finished) {
+        printf("Error: next state is not counted after 1 second");
+        if (close(socket_desc) < 0) {
+            printf("Could not close server socket\n");
+        }
+        
+        exit(ERROR_CODE_INTERRUPTION_ERROR);
     }
     
-    exit(ERROR_CODE_INTERRUPTION_ERROR);
+    printf("Next iteration\n");
+    printField(field);
+    finished = false;
+    alarm(INTERRUPTION_INTERVAL);
+    nextState(field);
 }
 
 // infinite game loop (function for server background thread)
 void* processGame() {
-    while (true) {
-        printf("Next iteration");
-        alarm(INTERRUPTION_INTERVAL);
-        printField(field);
-        nextState(field);
-    }
+    printf("Next iteration\n");
+    printField(field);
+    
+    alarm(INTERRUPTION_INTERVAL);
+    nextState(field);
+    while (true) {}
 }
 
 int main(int argc, const char * argv[]) {

@@ -61,6 +61,12 @@
             ReferencedContainer = "container:Task_4.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "/Users/OlgaVyrostko/Documents/WorkMaterials/8sem/&#x41e;&#x421;/game/Task_4/Task_4/field1"
+            isEnabled = "YES">
+         </CommandLineArgument>
+      </CommandLineArguments>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
