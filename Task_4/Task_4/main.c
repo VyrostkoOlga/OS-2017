@@ -189,7 +189,9 @@ void stopNextState(int sig) {
 // infinite game loop (function for server background thread)
 void* processGame() {
     while (true) {
+        printf("Next iteration");
         alarm(INTERRUPTION_INTERVAL);
+        printField(field);
         nextState(field);
     }
 }
@@ -244,6 +246,8 @@ int main(int argc, const char * argv[]) {
     }
     
     while ((client_sock = accept(socket_desc, (struct sockaddr *) &client, (socklen_t*)&c)) >= 0) {
+        printf("Connected with client");
+        
         if (send(client_sock, field, FIELD_SIZE * FIELD_SIZE, 0) < 0) {
             printf("Could not write to client\n");
         }
