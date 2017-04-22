@@ -1,0 +1,4 @@
+/bin/echo test wait
+/bin/ls -l wait
+/bin/echo test1 wait
+/bin/sleep 1 wait
