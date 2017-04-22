@@ -160,7 +160,7 @@ void startProcess(int p) {
             processFailureRun(pinfo_list[p]);
             break;
         case FORK_CHILD: {
-            execv((&(pinfo_list[p])->filename)[0], &(pinfo_list[p])->filename);
+            execv((&(pinfo_list[p])->filename)[0], (pinfo_list[p])->commandLine);
             syslog(LOG_ERR, "Failed to start %s", pinfo_list[p]->filename);
             exit(1);
         }
