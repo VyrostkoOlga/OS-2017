@@ -11,8 +11,8 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
-static const unsigned short FIELD_SIZE = 8;
-static const int PORT = 8889;
+#define FIELD_SIZE 8
+#define PORT 8889
 
 enum ERROR_CODES {
     ERROR_CODE_OK = 0,
