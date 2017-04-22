@@ -6,11 +6,17 @@
 //  Copyright © 2017 Ольга Выростко. All rights reserved.
 //
 
-#include <stdio.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <ctype.h>
 #include <unistd.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <signal.h>
+#include <sys/time.h>
+#include <errno.h>
+#include <stdbool.h>
+#include <ctype.h>
 #include <pthread.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -26,23 +32,27 @@ enum ERROR_CODES {
     ERROR_CODE_INIT_FIELD_ERROR,
     ERROR_CODE_SOCKET_ERROR,
     ERROR_CODE_INTERRUPTION_ERROR,
-    ERROR_CODE_THREAD_ERROR
+    ERROR_CODE_THREAD_ERROR,
+    ERROR_CODE_INSTALL_ALARM_ERROR
 };
 
-static const unsigned short FIELD_SIZE = 8;
+enum INSTALL_ALARM_ERROR_CODES {
+    INSTALL_ALARM_OK = 0,
+    INSTALL_ALARM_ERROR = -1
+};
 
-static const unsigned char ONE_BIT = 1;
-static const unsigned char TWO_BITS = 3;
-static const unsigned char THREE_BITS = 7;
+#define FIELD_SIZE 8
 
-static const unsigned short STAY_ALIVE[2] = {2, 3};
-static const unsigned short MAKE_ALIVE = 3;
+#define ONE_BIT 1
+#define TWO_BITS 3
+#define THREE_BITS 7
 
-static const int PORT = 8889;
-static const unsigned short INTERRUPTION_INTERVAL = 1;
+#define PORT 8889
+#define INTERRUPTION_INTERVAL 1
 
 unsigned char field[FIELD_SIZE];
 bool finished;
+bool handled;
 int socket_desc;
 
 int countLiveNear(unsigned char mask) {
@@ -62,10 +72,10 @@ int countLiveNear(unsigned char mask) {
 // modify field row for cell at column according to alive neighbours and alive state
 void modifyRow(const unsigned char *fieldRow, unsigned char *currentRow, unsigned short column, int liveNear) {
     if (*fieldRow & (ONE_BIT << column)) {
-        if ((liveNear == STAY_ALIVE[0]) || (liveNear == STAY_ALIVE[1])) {
+        if ((liveNear == 1) || (liveNear == 1)) {
             *currentRow |= (ONE_BIT << column);
         }
-    } else if (liveNear == MAKE_ALIVE) {
+    } else if (liveNear == 3) {
         *currentRow |= (ONE_BIT << column);
     }
 }
@@ -189,21 +199,38 @@ void stopNextState(int sig) {
         exit(ERROR_CODE_INTERRUPTION_ERROR);
     }
     
-    printf("Next iteration\n");
-    printField(field);
+    printf("handled\n");
+    handled = true;
     finished = false;
-    alarm(INTERRUPTION_INTERVAL);
-    nextState(field);
 }
 
-// infinite game loop (function for server background thread)
+// установка таймера с интервалом в 1 секунуд
+int installAlarm() {
+    struct sigaction sa;
+    struct itimerval timer;
+    memset(&sa, 0, sizeof (sa));
+    sa.sa_handler = &stopNextState;
+    sigaction(SIGALRM, &sa, NULL);
+    timer.it_value.tv_sec = INTERRUPTION_INTERVAL;
+    timer.it_value.tv_usec = 0;
+    timer.it_interval = timer.it_value;
+    if (setitimer(ITIMER_REAL, &timer, NULL) == -1) {
+        printf("Error setting timer\n");
+        return INSTALL_ALARM_ERROR;
+    }
+    return INSTALL_ALARM_OK;
+}
+
 void* processGame() {
-    printf("Next iteration\n");
     printField(field);
-    
-    alarm(INTERRUPTION_INTERVAL);
     nextState(field);
-    while (true) {}
+    while (true) {
+        if (handled) {
+            printField(field);
+            nextState(field);
+            handled = false;
+        }
+    }
 }
 
 int main(int argc, const char * argv[]) {
@@ -217,18 +244,21 @@ int main(int argc, const char * argv[]) {
     }
     
     // set alarm handler
-    signal(SIGALRM, stopNextState);
-    
-    // get initial state from file passed as the first non-preset command line argument
-    if (initField(argv[1], field) != INIT_FIELD_ERROR_OK) {
-        return ERROR_CODE_INIT_FIELD_ERROR;
+    if (installAlarm() == INSTALL_ALARM_ERROR) {
+        return ERROR_CODE_INSTALL_ALARM_ERROR;
     }
+    finished = false;
     
     // start game thread
     pthread_t gameId;
     if (pthread_create(&gameId, NULL, processGame, NULL)) {
         printf("Error creating game thread");
         return ERROR_CODE_THREAD_ERROR;
+    }
+    
+    // get initial state from file passed as the first non-preset command line argument
+    if (initField(argv[1], field) != INIT_FIELD_ERROR_OK) {
+        return ERROR_CODE_INIT_FIELD_ERROR;
     }
     
     // listen to clients' connections
@@ -255,8 +285,15 @@ int main(int argc, const char * argv[]) {
         return ERROR_CODE_SOCKET_ERROR;
     }
     
-    while ((client_sock = accept(socket_desc, (struct sockaddr *) &client, (socklen_t*)&c)) >= 0) {
+    while (true) {
+        client_sock = accept(socket_desc, (struct sockaddr *) &client, (socklen_t*)&c);
+        if (client_sock < 0) {
+            // error while connection with client or alarm interruption
+            // just ignore
+            continue;
+        }
         printf("Connected with client");
+        printf("%d", client_sock);
         
         if (send(client_sock, field, FIELD_SIZE * FIELD_SIZE, 0) < 0) {
             printf("Could not write to client\n");
