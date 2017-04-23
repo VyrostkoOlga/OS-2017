@@ -422,6 +422,11 @@ int main(int argc, const char * argv[]) {
     int offset = atoi(argv[2]);
     int limit = atoi(argv[3]);
     
+    if ((!strcmp(argv[1], "-w")) && ((argc < 5) || (strlen(argv[4]) < limit))) {
+        printf("Two short input string to write\n");
+        return -1;
+    }
+    
     char buffer[BUFFER_SIZE];
     if (!strcmp(argv[1], "-r")) {
         if ((readFile(TEST_FILENAME, offset, limit, buffer)) != limit) {
