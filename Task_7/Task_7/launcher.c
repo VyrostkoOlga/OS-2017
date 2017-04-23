@@ -18,6 +18,7 @@
 struct Handler {
     int pid;
     int pipe[2];
+    int result_pipe[2];
 };
 
 void processChunk(char *chunck, size_t chunck_size, char *resultChunck) {
@@ -48,6 +49,7 @@ void processChunk(char *chunck, size_t chunck_size, char *resultChunck) {
 void handle(struct Handler handler) {
     printf("Child process\n");
     close(handler.pipe[1]);
+    close(handler.result_pipe[0]);
     
     char buffer[BUFFER_SIZE];
     char resultBuffer[BUFFER_SIZE * 2];
@@ -55,6 +57,13 @@ void handle(struct Handler handler) {
     size_t read_bytes = read(handler.pipe[0], buffer, BUFFER_SIZE);
     processChunk(buffer, read_bytes, resultBuffer);
     
+    size_t write_bytes = write(handler.result_pipe[1], resultBuffer, strlen(resultBuffer));
+    if (write_bytes != strlen(resultBuffer)) {
+        printf("Failed to write result\n");
+        exit(-1);
+    }
+    
+    /*
     FILE *fd = fopen(SRC_FILE, "w");
     if (!fd) {
         printf("Failed to open file to write");
@@ -69,7 +78,7 @@ void handle(struct Handler handler) {
     if (fclose(fd) < 0) {
         printf("Failed to close file\n");
         exit(-1);
-    }
+    }*/
 }
 
 int main(int argc, const char * argv[]) {
@@ -85,6 +94,7 @@ int main(int argc, const char * argv[]) {
     
     struct Handler handler;
     pipe(handler.pipe);
+    pipe(handler.result_pipe);
     
     pid_t pid;
     switch ((pid = fork())) {
@@ -97,7 +107,13 @@ int main(int argc, const char * argv[]) {
         default:
             printf("Parent process\n");
             close(handler.pipe[0]);
+            close(handler.result_pipe[1]);
+            
             write(handler.pipe[1], "taaabb", 6);
+            
+            char result[BUFFER_SIZE * 2];
+            read(handler.result_pipe[0], result, BUFFER_SIZE * 2);
+            
             exit(0);
     }
     
