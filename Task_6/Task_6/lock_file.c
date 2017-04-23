@@ -28,7 +28,7 @@ enum LOCK_TYPES {
 #define MAX_NUMBER_OF_TRIES 50
 
 #define BUFFER_SIZE 50
-#define TEST_FILENAME "/Users/OlgaVyrostko/Documents/WorkMaterials/8sem/ОС/game/Task_6/Task_6/passwords"
+#define TEST_FILENAME "./passwords"
 
 struct Lock {
     int pid;                                // identifier of process that locks
