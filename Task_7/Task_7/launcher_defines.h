@@ -13,5 +13,6 @@
 #define BUFFER_SIZE 255
 
 #define SRC_FILE "/Users/OlgaVyrostko/Documents/WorkMaterials/8sem/ОС/game/Task_7/Task_7/src"
+#define DST_FILE "/Users/OlgaVyrostko/Documents/WorkMaterials/8sem/ОС/game/Task_7/Task_7/dst"
 
 #endif /* launcher_defines_h */

@@ -27,6 +27,7 @@
 		7DFB0E1E1EACE6000003CF7F /* launcher.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = launcher.c; sourceTree = "<group>"; };
 		7DFB0E201EACE8770003CF7F /* launcher_defines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = launcher_defines.h; sourceTree = "<group>"; };
 		7DFB0E211EACE8F30003CF7F /* src */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = src; sourceTree = "<group>"; };
+		7DFB0E221EACF9EC0003CF7F /* dst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dst; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,6 +60,7 @@
 		7DFB0E131EACB4020003CF7F /* Task_7 */ = {
 			isa = PBXGroup;
 			children = (
+				7DFB0E221EACF9EC0003CF7F /* dst */,
 				7DFB0E1E1EACE6000003CF7F /* launcher.c */,
 				7DFB0E201EACE8770003CF7F /* launcher_defines.h */,
 				7DFB0E211EACE8F30003CF7F /* src */,

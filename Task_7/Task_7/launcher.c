@@ -51,47 +51,38 @@ void handle(struct Handler handler) {
     close(handler.pipe[1]);
     close(handler.result_pipe[0]);
     
-    char buffer[BUFFER_SIZE];
-    char resultBuffer[BUFFER_SIZE * 2];
+    char cl_buffer[BUFFER_SIZE];
+    char cl_resultBuffer[BUFFER_SIZE * 2];
     
-    size_t read_bytes = read(handler.pipe[0], buffer, BUFFER_SIZE);
-    processChunk(buffer, read_bytes, resultBuffer);
+    size_t cl_read_bytes, cl_write_bytes;
     
-    size_t write_bytes = write(handler.result_pipe[1], resultBuffer, strlen(resultBuffer));
-    if (write_bytes != strlen(resultBuffer)) {
-        printf("Failed to write result\n");
-        exit(-1);
+    while ((cl_read_bytes = read(handler.pipe[0], cl_buffer, BUFFER_SIZE))) {
+        processChunk(cl_buffer, cl_read_bytes, cl_resultBuffer);
+        
+        cl_write_bytes = write(handler.result_pipe[1], cl_resultBuffer, strlen(cl_resultBuffer));
+        if (cl_write_bytes != strlen(cl_resultBuffer)) {
+            printf("Failed to write result\n");
+            exit(-1);
+        }
     }
-    
-    /*
-    FILE *fd = fopen(SRC_FILE, "w");
-    if (!fd) {
-        printf("Failed to open file to write");
-        exit(-1);
-    }
-    
-    if (!fwrite(resultBuffer, sizeof(char), strlen(resultBuffer), fd)) {
-        printf("Failed to write file\n");
-        exit(-1);
-    }
-    
-    if (fclose(fd) < 0) {
-        printf("Failed to close file\n");
-        exit(-1);
-    }*/
 }
 
 int main(int argc, const char * argv[]) {
     
-    //char buffer[BUFFER_SIZE];
+    char buffer[BUFFER_SIZE];
+    char result_buffer[BUFFER_SIZE * 2];
+    size_t read_bytes, write_bytes;
     
-    /*
-    FILE *fd = fopen(SRC_FILE, "r");
-    size_t read_bytes;
-    while ((read_bytes = fread(buffer, sizeof(char), BUFFER_SIZE, fd)) > 0) {
-        
-    }*/
-    
+    FILE *rf = fopen(SRC_FILE, "r");
+    if (!rf) {
+        printf("Failed to open src file\n");
+        return -1;
+    }
+    FILE *wf = fopen(DST_FILE, "w");
+    if (!wf) {
+        printf("Failed to open dst file\n");
+        return -1;
+    }
     struct Handler handler;
     pipe(handler.pipe);
     pipe(handler.result_pipe);
@@ -109,10 +100,22 @@ int main(int argc, const char * argv[]) {
             close(handler.pipe[0]);
             close(handler.result_pipe[1]);
             
-            write(handler.pipe[1], "taaabb", 6);
+            while ((read_bytes = fread(buffer, sizeof(char), BUFFER_SIZE, rf)) > 0) {
+                write_bytes = write(handler.pipe[1], buffer, read_bytes);
+                if (write_bytes != read_bytes) {
+                    printf("Failed to write data to pipe\n");
+                    return -1;
+                }
+                read_bytes = read(handler.result_pipe[0], result_buffer, BUFFER_SIZE * 2);
+                write_bytes = fwrite(result_buffer, sizeof(char), read_bytes, wf);
+                if (write_bytes != read_bytes) {
+                    printf("Failed to write data to file\n");
+                    return -1;
+                }
+            }
             
-            char result[BUFFER_SIZE * 2];
-            read(handler.result_pipe[0], result, BUFFER_SIZE * 2);
+            close(handler.result_pipe[0]);
+            close(handler.pipe[1]);
             
             exit(0);
     }
