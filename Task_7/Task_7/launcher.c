@@ -56,14 +56,13 @@ void handle(struct Handler handler) {
     
     size_t cl_read_bytes, cl_write_bytes;
     
-    while ((cl_read_bytes = read(handler.pipe[0], cl_buffer, BUFFER_SIZE))) {
-        processChunk(cl_buffer, cl_read_bytes, cl_resultBuffer);
-        
-        cl_write_bytes = write(handler.result_pipe[1], cl_resultBuffer, strlen(cl_resultBuffer));
-        if (cl_write_bytes != strlen(cl_resultBuffer)) {
-            printf("Failed to write result\n");
-            exit(-1);
-        }
+    cl_read_bytes = read(handler.pipe[0], cl_buffer, BUFFER_SIZE);
+    processChunk(cl_buffer, cl_read_bytes, cl_resultBuffer);
+    
+    cl_write_bytes = write(handler.result_pipe[1], cl_resultBuffer, strlen(cl_resultBuffer));
+    if (cl_write_bytes != strlen(cl_resultBuffer)) {
+        printf("Failed to write result\n");
+        exit(-1);
     }
 }
 
@@ -83,41 +82,46 @@ int main(int argc, const char * argv[]) {
         printf("Failed to open dst file\n");
         return -1;
     }
-    struct Handler handler;
-    pipe(handler.pipe);
-    pipe(handler.result_pipe);
+    
+    struct Handler handler[MAX_HANDLERS_COUNT];
     
     pid_t pid;
-    switch ((pid = fork())) {
-        case -1:
-            printf("Failed to fork\n");
-            return -1;
-        case 0:
-            handle(handler);
-            exit(0);
-        default:
-            printf("Parent process\n");
-            close(handler.pipe[0]);
-            close(handler.result_pipe[1]);
-            
-            while ((read_bytes = fread(buffer, sizeof(char), BUFFER_SIZE, rf)) > 0) {
-                write_bytes = write(handler.pipe[1], buffer, read_bytes);
-                if (write_bytes != read_bytes) {
-                    printf("Failed to write data to pipe\n");
-                    return -1;
+    int p;
+    for (p = 0; p < MAX_HANDLERS_COUNT; p++) {
+        pipe(handler[p].pipe);
+        pipe(handler[p].result_pipe);
+        switch ((pid = fork())) {
+            case -1:
+                printf("Failed to fork\n");
+                return -1;
+            case 0:
+                handle(handler[p]);
+                exit(0);
+            default:
+                printf("Parent process\n");
+                handler[p].pid = pid;
+                close(handler[p].pipe[0]);
+                close(handler[p].result_pipe[1]);
+                
+                while ((read_bytes = fread(buffer, sizeof(char), BUFFER_SIZE, rf)) > 0) {
+                    write_bytes = write(handler[p].pipe[1], buffer, read_bytes);
+                    if (write_bytes != read_bytes) {
+                        printf("Failed to write data to pipe\n");
+                        return -1;
+                    }
+                    read_bytes = read(handler[p].result_pipe[0], result_buffer, BUFFER_SIZE * 2);
+                    write_bytes = fwrite(result_buffer, sizeof(char), read_bytes, wf);
+                    if (write_bytes != read_bytes) {
+                        printf("Failed to write data to file\n");
+                        return -1;
+                    }
                 }
-                read_bytes = read(handler.result_pipe[0], result_buffer, BUFFER_SIZE * 2);
-                write_bytes = fwrite(result_buffer, sizeof(char), read_bytes, wf);
-                if (write_bytes != read_bytes) {
-                    printf("Failed to write data to file\n");
-                    return -1;
-                }
-            }
-            
-            close(handler.result_pipe[0]);
-            close(handler.pipe[1]);
-            
-            exit(0);
+                
+                close(handler[p].result_pipe[0]);
+                close(handler[p].pipe[1]);
+                
+                exit(0);
+        }
     }
     
     return 0;
