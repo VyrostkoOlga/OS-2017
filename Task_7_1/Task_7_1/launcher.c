@@ -59,6 +59,10 @@ void closeAll(int spid, int dpid) {
 }
 
 int main(int argc, char **argv) {
+    /*
+     launch data_source, data_handlers, data_dest
+     prepare params for all process, launch, create pipes between them
+     */
     
     if (argc != 4) {
         printf("Usage: ./launcher src_file dst_file number_of_handlers\n");
@@ -93,6 +97,7 @@ int main(int argc, char **argv) {
         }
     }
     
+    // start processes
     char *sargs[handlers_count + 3];
     char *dargs[handlers_count + 3];
     int spid, dpid;
@@ -148,4 +153,5 @@ int main(int argc, char **argv) {
     }
     
     closeAll(spid, dpid);
+    return LAUNCHER_ERROR_OK;
 }

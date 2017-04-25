@@ -106,5 +106,5 @@ int main(int argc, char **argv) {
         printf("Failed to close src or dst in handler\n");
         return DATA_HANDLER_ERROR_READ_OR_WRITE;
     }
-    return 0;
+    return DATA_HANDLER_ERROR_OK;
 }

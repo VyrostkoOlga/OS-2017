@@ -113,6 +113,13 @@ int main(int argc, char **argv) {
             timestamp.tv_sec = 1;
             timestamp.tv_usec = 0;
             
+            /*
+             golden path: 
+             if selected = 0 -> ok, break, 1 instr
+             if selected < 0 -> error, process error, return
+             if selected > 9 -> ok, continue, process chunk
+             */
+            
             int selected;
             if (!(selected = select(dests[i].fd + 1, NULL, &set, NULL, &timestamp))) {
                 break;
@@ -147,5 +154,5 @@ int main(int argc, char **argv) {
         printf("Failed to close src file\n");
         return DATA_SOURCE_ERROR_CODE_FILE_ERROR;
     }
-    return 0;
+    return DATA_SOURCE_ERROR_CODE_OK;
 }
