@@ -86,13 +86,18 @@ int main(int argc, char **argv) {
             out_timestamp.tv_sec = 1;
             out_timestamp.tv_usec = 0;
             
-            if ((selected = select(dst + 1, NULL, &set_out, NULL, &out_timestamp)) < 0) {
+            if (!(selected = select(dst + 1, NULL, &set_out, NULL, &out_timestamp))) {
+                break;
+            }
+            
+            if (selected < 0) {
                 printf("Failed to select data dst\n");
                 return DATA_HANDLER_ERROR_SELECT;
-            } else if (selected) {
-                write(dst, &buffer, read_bytes);
-            } else {
-                break;
+            }
+            
+            if (write(dst, &buffer, read_bytes) != read_bytes) {
+                printf("Failed to write to destination\n");
+                return DATA_HANDLER_ERROR_READ_OR_WRITE;
             }
         }
     }
