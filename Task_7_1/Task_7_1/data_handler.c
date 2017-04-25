@@ -27,34 +27,18 @@ size_t encodeChunk(char *buffer, size_t chunk_size, char *resultBuffer) {
     /*
      encoding of the chunk
      */
-    
-    int idx, result_idx, len;
-    idx = 1;
-    result_idx = len = 0;
-    
-    char current;
-    while (idx < chunk_size) {
-        resultBuffer[result_idx++] = buffer[idx];
-        current = buffer[idx];
-        while ((idx + len < chunk_size) && (len < 9) && (current == buffer[idx + len])) { len++; }
-        if (len > 1) {
-            resultBuffer[result_idx++] = (len) + '0';
-        }
-        idx += len;
-        len = 0;
+    int i = 0;
+    for (i = 1; i < chunk_size; i++) {
+        char bit = buffer[i] & 1;
+        buffer[i] = bit + '0';
     }
-    resultBuffer[result_idx++] = '\0';
-    return result_idx;
+    return chunk_size;
 }
 
 int main(int argc, char **argv) {
     /*
-     handler: process chunk of data, encode it with modification of RLE
-     aaaaaa -> a5
-     aaabba -> a3b2a
-     max repetition length = 9
-     got data from selected data_source
-     send data to selected data_dest
+     handler: process chunk of data, encode it
+     process char by char, replace each char with its low bit
      */
     
     if (argc < 3) {
@@ -84,13 +68,14 @@ int main(int argc, char **argv) {
             return DATA_HANDLER_ERROR_SELECT;
         }
         
-        char buffer[BUFFER_SIZE];
-        char resultBuffer[BUFFER_SIZE * 2];
-        size_t read_bytes = read(src, &buffer, BUFFER_SIZE);
+        char buffer[BUFFER_SIZE + 1];
+        char resultBuffer[BUFFER_SIZE + 1];
+        memset(resultBuffer, '\0', BUFFER_SIZE + 1);
+        size_t read_bytes = read(src, &buffer, BUFFER_SIZE + 1);
         if (read_bytes) {
             printf("read from src: %s; offset: %hhd; read_bytes: %zu\n", &buffer[1], buffer[0], read_bytes);
             read_bytes = encodeChunk(buffer, read_bytes, resultBuffer);
-            printf("%s\n", resultBuffer);
+            printf("%s\n", buffer);
             printf("read_bytes: %zu\n", read_bytes);
             
             fd_set set_out;
@@ -105,8 +90,7 @@ int main(int argc, char **argv) {
                 printf("Failed to select data dst\n");
                 return DATA_HANDLER_ERROR_SELECT;
             } else if (selected) {
-                write(dst, &buffer[0], 1);
-                write(dst, &resultBuffer, read_bytes);
+                write(dst, &buffer, read_bytes);
             } else {
                 break;
             }

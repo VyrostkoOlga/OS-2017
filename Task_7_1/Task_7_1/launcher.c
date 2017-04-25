@@ -76,6 +76,10 @@ int main(int argc, char **argv) {
         return LAUNCHER_ERROR_WRONG_PARAMS;
     }
     
+    if (handlers_count != 1) {
+        handlers_count = handlers_count % 2 ? handlers_count - 1 : handlers_count;
+    }
+    
     // create pipes
     int i;
     for (i = 0; i < handlers_count; i++) {

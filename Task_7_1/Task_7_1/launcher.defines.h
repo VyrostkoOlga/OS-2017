@@ -9,9 +9,9 @@
 #ifndef launcher_defines_h
 #define launcher_defines_h
 
-#define BUFFER_SIZE 10
+#define BUFFER_SIZE 32
 
-#define MAX_HANDLERS_COUNT 9
+#define MAX_HANDLERS_COUNT 5
 
 #define SRC_EXC "./data_source"
 #define HANDLER_EXC "./data_handler"

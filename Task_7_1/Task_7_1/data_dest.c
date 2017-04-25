@@ -61,10 +61,15 @@ int main(int argc, char **argv) {
         return DATA_DEST_ERROR_CODE_WRONG_PARAMS;
     }
     
+    if (handlers_count != 1) {
+        handlers_count = handlers_count % 2 ? handlers_count - 1 : handlers_count;
+    }
+    
     initHandlers(argv);
     
     int j;
     char buffer[BUFFER_SIZE + 1];
+    memset(buffer, '\0', BUFFER_SIZE + 1);
     while (true) {
         fd_set set;
         FD_ZERO(&set);

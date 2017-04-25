@@ -74,6 +74,10 @@ int main(int argc, char **argv) {
         return DATA_SOURCE_ERROR_CODE_WRONG_PARAMS;
     }
     
+    if (handlers_count != 1) {
+        handlers_count = handlers_count % 2 ? handlers_count - 1 : handlers_count;
+    }
+    
     initHandlers(argv);
     
     FILE *fd = fopen(argv[1], "r");
@@ -84,6 +88,7 @@ int main(int argc, char **argv) {
     
     size_t read_bytes;
     char buffer[BUFFER_SIZE + 1];
+    memset(buffer, '\0', BUFFER_SIZE + 1);
     
     int i;
     int offset = 0;
@@ -94,6 +99,10 @@ int main(int argc, char **argv) {
         for (i = 0; i < handlers_count; i++) {
             if (i == handlers_count - 1) {
                 chunk_size += last_chunk_size;
+            }
+            
+            if (!chunk_size) {
+                continue;
             }
             
             fd_set set;
