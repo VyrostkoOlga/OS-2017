@@ -100,47 +100,41 @@ int main(int argc, char **argv) {
             break;
     }
     
-    int hdl_pids[handlers_count];
-    
-    // в цикле запускаем обработчики hdl
     for (i = 0; i < handlers_count; i++) {
-        // составляем массив аргументов для hdl
-        char *hdl_argv[4];
-        hdl_argv[0] = HANDLER_EXC;
-        // канал от источника
-        char *fd_src_str = (char *) malloc(32);
-        sprintf(fd_src_str, "%d", pipes[i].src[0]);
-        hdl_argv[1] = fd_src_str;
-        // канал в приёмник
-        char *fd_dst_str = (char *) malloc(32);
-        sprintf(fd_dst_str, "%d", pipes[i].dst[1]);
-        hdl_argv[2] = fd_dst_str;
-        hdl_argv[3] = 0;
-        // форкаем процесс для запуска hdl
-        if ((hdl_pids[i] = fork()) == -1) {
-            perror("Error forking process for hdl");
-            return 1;
-        } else if (hdl_pids[i] == 0) {
-            execv(hdl_argv[0], hdl_argv);
-            perror("Error running hdl");
-            return 1;
+        char *hargs[4];
+        hargs[0] = HANDLER_EXC;
+        char *str = (char *) malloc(32);
+        sprintf(str, "%d", pipes[i].src[0]);
+        hargs[1] = str;
+        str = (char *) malloc(32);
+        sprintf(str, "%d", pipes[i].dst[1]);
+        hargs[2] = str;
+        hargs[3] = 0;
+        
+        switch ((pipes[i].handler = fork())) {
+            case -1:
+                printf("Failed to fork process for handler\n");
+                return LAUNCHER_ERROR_FORK;
+            case 0:
+                execv(hargs[0], hargs);
+                printf("Failed to fork process for handler\n");
+                return LAUNCHER_ERROR_FORK;
+            default:
+                break;
         }
     }
     
-    // ждём завершения src и закрываем все его каналы для записи
     waitpid(spid, NULL, 0);
     for (i = 0; i < handlers_count; i++) {
         close(pipes[i].src[0]);
     }
     
-    // ждём завершения hdl и закрываем их каналы
     for (i = 0; i < handlers_count; i++) {
-        waitpid(hdl_pids[i], NULL, 0);
+        waitpid(pipes[i].handler, NULL, 0);
         close(pipes[i].src[1]);
         close(pipes[i].dst[0]);
     }
     
-    // ждём завершения dst и закрываем его каналы для чтения
     waitpid(dpid, NULL, 0);
     for (i = 0; i < handlers_count; i++) {
         close(pipes[i].dst[1]);
