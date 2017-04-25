@@ -7,10 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+<<<<<<< HEAD
 		7D768EA71EAF12C400418386 /* data_handler.c in Sources */ = {isa = PBXBuildFile; fileRef = 7D768EA61EAF12C400418386 /* data_handler.c */; };
 		7D768EAB1EAF12D200418386 /* data_dest.c in Sources */ = {isa = PBXBuildFile; fileRef = 7D768EA81EAF12D200418386 /* data_dest.c */; };
 		7D768EAC1EAF12D200418386 /* data_source.c in Sources */ = {isa = PBXBuildFile; fileRef = 7D768EA91EAF12D200418386 /* data_source.c */; };
 		7D768EAD1EAF12D200418386 /* launcher.c in Sources */ = {isa = PBXBuildFile; fileRef = 7D768EAA1EAF12D200418386 /* launcher.c */; };
+=======
+		7D5B76B11EAE60F300E17A70 /* data_source.c in Sources */ = {isa = PBXBuildFile; fileRef = 7D5B76B01EAE60F300E17A70 /* data_source.c */; };
+		7D5B76B41EAE670600E17A70 /* data_handler.c in Sources */ = {isa = PBXBuildFile; fileRef = 7D5B76B31EAE670600E17A70 /* data_handler.c */; };
+		7D5B76B61EAE674600E17A70 /* data_dest.c in Sources */ = {isa = PBXBuildFile; fileRef = 7D5B76B51EAE674600E17A70 /* data_dest.c */; };
+		7D5B76B81EAE679000E17A70 /* launcher.c in Sources */ = {isa = PBXBuildFile; fileRef = 7D5B76B71EAE679000E17A70 /* launcher.c */; };
+>>>>>>> 1ab933e... fix
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -27,6 +34,7 @@
 
 /* Begin PBXFileReference section */
 		7D5B76A61EAE60DD00E17A70 /* Task_7_1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Task_7_1; sourceTree = BUILT_PRODUCTS_DIR; };
+<<<<<<< HEAD
 		7D768EA51EAF12C400418386 /* compile.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = compile.sh; sourceTree = "<group>"; };
 		7D768EA61EAF12C400418386 /* data_handler.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = data_handler.c; sourceTree = "<group>"; };
 		7D768EA81EAF12D200418386 /* data_dest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = data_dest.c; sourceTree = "<group>"; };
@@ -34,6 +42,16 @@
 		7D768EAA1EAF12D200418386 /* launcher.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = launcher.c; sourceTree = "<group>"; };
 		7D768EAE1EAF12DD00418386 /* dst.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dst.txt; sourceTree = "<group>"; };
 		7D768EAF1EAF12DD00418386 /* launcher.defines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = launcher.defines.h; sourceTree = "<group>"; };
+=======
+		7D5B76B01EAE60F300E17A70 /* data_source.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = data_source.c; sourceTree = "<group>"; };
+		7D5B76B31EAE670600E17A70 /* data_handler.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = data_handler.c; sourceTree = "<group>"; };
+		7D5B76B51EAE674600E17A70 /* data_dest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = data_dest.c; sourceTree = "<group>"; };
+		7D5B76B71EAE679000E17A70 /* launcher.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = launcher.c; sourceTree = "<group>"; };
+		7D5B76B91EAE67CD00E17A70 /* src */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = src; sourceTree = "<group>"; };
+		7D5B76BB1EAE684900E17A70 /* compile.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = compile.sh; sourceTree = "<group>"; };
+		7D5B76BC1EAE68AF00E17A70 /* launcher.defines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = launcher.defines.h; sourceTree = "<group>"; };
+		7D768EA41EAEE56800418386 /* dst.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dst.txt; sourceTree = "<group>"; };
+>>>>>>> 1ab933e... fix
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +84,7 @@
 		7D5B76A81EAE60DD00E17A70 /* Task_7_1 */ = {
 			isa = PBXGroup;
 			children = (
+<<<<<<< HEAD
 				7D768EAE1EAF12DD00418386 /* dst.txt */,
 				7D768EAF1EAF12DD00418386 /* launcher.defines.h */,
 				7D768EA81EAF12D200418386 /* data_dest.c */,
@@ -73,6 +92,16 @@
 				7D768EAA1EAF12D200418386 /* launcher.c */,
 				7D768EA51EAF12C400418386 /* compile.sh */,
 				7D768EA61EAF12C400418386 /* data_handler.c */,
+=======
+				7D768EA41EAEE56800418386 /* dst.txt */,
+				7D5B76BC1EAE68AF00E17A70 /* launcher.defines.h */,
+				7D5B76B01EAE60F300E17A70 /* data_source.c */,
+				7D5B76B31EAE670600E17A70 /* data_handler.c */,
+				7D5B76B51EAE674600E17A70 /* data_dest.c */,
+				7D5B76B71EAE679000E17A70 /* launcher.c */,
+				7D5B76B91EAE67CD00E17A70 /* src */,
+				7D5B76BB1EAE684900E17A70 /* compile.sh */,
+>>>>>>> 1ab933e... fix
 			);
 			path = Task_7_1;
 			sourceTree = "<group>";
@@ -134,10 +163,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+<<<<<<< HEAD
 				7D768EAC1EAF12D200418386 /* data_source.c in Sources */,
 				7D768EAD1EAF12D200418386 /* launcher.c in Sources */,
 				7D768EA71EAF12C400418386 /* data_handler.c in Sources */,
 				7D768EAB1EAF12D200418386 /* data_dest.c in Sources */,
+=======
+				7D5B76B41EAE670600E17A70 /* data_handler.c in Sources */,
+				7D5B76B81EAE679000E17A70 /* launcher.c in Sources */,
+				7D5B76B11EAE60F300E17A70 /* data_source.c in Sources */,
+				7D5B76B61EAE674600E17A70 /* data_dest.c in Sources */,
+>>>>>>> 1ab933e... fix
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
