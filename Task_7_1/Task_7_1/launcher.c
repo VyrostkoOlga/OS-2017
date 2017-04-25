@@ -39,6 +39,23 @@ void fillHandlerArgs(char *hargs[4], int idx) {
     hargs[3] = 0;
 }
 
+void closeAll(int spid, int dpid) {
+    int i;
+    waitpid(spid, NULL, 0);
+    for (i = 0; i < handlers_count; i++) {
+        close(pipes[i].src[0]);
+    }
+    for (i = 0; i < handlers_count; i++) {
+        waitpid(pipes[i].handler, NULL, 0);
+        close(pipes[i].src[1]);
+        close(pipes[i].dst[0]);
+    }
+    waitpid(dpid, NULL, 0);
+    for (i = 0; i < handlers_count; i++) {
+        close(pipes[i].dst[1]);
+    }
+}
+
 int main(int argc, char **argv) {
     
     if (argc != 4) {
@@ -128,20 +145,5 @@ int main(int argc, char **argv) {
         }
     }
     
-    waitpid(spid, NULL, 0);
-    for (i = 0; i < handlers_count; i++) {
-        close(pipes[i].src[0]);
-    }
-    
-    for (i = 0; i < handlers_count; i++) {
-        waitpid(pipes[i].handler, NULL, 0);
-        close(pipes[i].src[1]);
-        close(pipes[i].dst[0]);
-    }
-    
-    waitpid(dpid, NULL, 0);
-    for (i = 0; i < handlers_count; i++) {
-        close(pipes[i].dst[1]);
-    }
-    
+    closeAll(spid, dpid);
 }
