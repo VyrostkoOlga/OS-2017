@@ -28,6 +28,17 @@ struct HandlerPipe {
     int dst[2];
 } pipes[MAX_HANDLERS_COUNT];
 
+void fillHandlerArgs(char *hargs[4], int idx) {
+    hargs[0] = HANDLER_EXC;
+    char *str = (char *) malloc(32);
+    sprintf(str, "%d", pipes[idx].src[0]);
+    hargs[1] = str;
+    str = (char *) malloc(32);
+    sprintf(str, "%d", pipes[idx].dst[1]);
+    hargs[2] = str;
+    hargs[3] = 0;
+}
+
 int main(int argc, char **argv) {
     
     if (argc != 4) {
@@ -102,14 +113,7 @@ int main(int argc, char **argv) {
     
     for (i = 0; i < handlers_count; i++) {
         char *hargs[4];
-        hargs[0] = HANDLER_EXC;
-        char *str = (char *) malloc(32);
-        sprintf(str, "%d", pipes[i].src[0]);
-        hargs[1] = str;
-        str = (char *) malloc(32);
-        sprintf(str, "%d", pipes[i].dst[1]);
-        hargs[2] = str;
-        hargs[3] = 0;
+        fillHandlerArgs(hargs, i);
         
         switch ((pipes[i].handler = fork())) {
             case -1:
