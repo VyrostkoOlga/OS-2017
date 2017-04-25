@@ -28,14 +28,16 @@ struct HandlerPipe {
     int dst[2];
 } pipes[MAX_HANDLERS_COUNT];
 
+char *formatProcessLine(int p) {
+    char *line = (char *) malloc(32);
+    sprintf(line, "%d", p);
+    return line;
+}
+
 void fillHandlerArgs(char *hargs[4], int idx) {
     hargs[0] = HANDLER_EXC;
-    char *str = (char *) malloc(32);
-    sprintf(str, "%d", pipes[idx].src[0]);
-    hargs[1] = str;
-    str = (char *) malloc(32);
-    sprintf(str, "%d", pipes[idx].dst[1]);
-    hargs[2] = str;
+    hargs[1] = formatProcessLine(pipes[idx].src[0]);
+    hargs[2] = formatProcessLine(pipes[idx].dst[1]);
     hargs[3] = 0;
 }
 
@@ -96,12 +98,8 @@ int main(int argc, char **argv) {
     sargs[1] = argv[1];
     dargs[1] = argv[2];
     for (i = 0; i < handlers_count; i++) {
-        char *src_line = (char *) malloc(32);
-        char *dst_line = (char *) malloc(32);
-        sprintf(src_line, "%d", pipes[i].src[1]);
-        sprintf(dst_line, "%d", pipes[i].dst[0]);
-        sargs[i + 2] = src_line;
-        dargs[i + 2] = dst_line;
+        sargs[i + 2] = formatProcessLine(pipes[i].src[1]);
+        dargs[i + 2] = formatProcessLine(pipes[i].dst[0]);
     }
     sargs[handlers_count + 2] = dargs[handlers_count + 2] = 0;
     
