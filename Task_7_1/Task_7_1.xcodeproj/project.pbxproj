@@ -7,7 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7D5B76AA1EAE60DD00E17A70 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 7D5B76A91EAE60DD00E17A70 /* main.c */; };
+		7D768EA71EAF12C400418386 /* data_handler.c in Sources */ = {isa = PBXBuildFile; fileRef = 7D768EA61EAF12C400418386 /* data_handler.c */; };
+		7D768EAB1EAF12D200418386 /* data_dest.c in Sources */ = {isa = PBXBuildFile; fileRef = 7D768EA81EAF12D200418386 /* data_dest.c */; };
+		7D768EAC1EAF12D200418386 /* data_source.c in Sources */ = {isa = PBXBuildFile; fileRef = 7D768EA91EAF12D200418386 /* data_source.c */; };
+		7D768EAD1EAF12D200418386 /* launcher.c in Sources */ = {isa = PBXBuildFile; fileRef = 7D768EAA1EAF12D200418386 /* launcher.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -24,7 +27,13 @@
 
 /* Begin PBXFileReference section */
 		7D5B76A61EAE60DD00E17A70 /* Task_7_1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Task_7_1; sourceTree = BUILT_PRODUCTS_DIR; };
-		7D5B76A91EAE60DD00E17A70 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		7D768EA51EAF12C400418386 /* compile.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = compile.sh; sourceTree = "<group>"; };
+		7D768EA61EAF12C400418386 /* data_handler.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = data_handler.c; sourceTree = "<group>"; };
+		7D768EA81EAF12D200418386 /* data_dest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = data_dest.c; sourceTree = "<group>"; };
+		7D768EA91EAF12D200418386 /* data_source.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = data_source.c; sourceTree = "<group>"; };
+		7D768EAA1EAF12D200418386 /* launcher.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = launcher.c; sourceTree = "<group>"; };
+		7D768EAE1EAF12DD00418386 /* dst.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dst.txt; sourceTree = "<group>"; };
+		7D768EAF1EAF12DD00418386 /* launcher.defines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = launcher.defines.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,7 +66,13 @@
 		7D5B76A81EAE60DD00E17A70 /* Task_7_1 */ = {
 			isa = PBXGroup;
 			children = (
-				7D5B76A91EAE60DD00E17A70 /* main.c */,
+				7D768EAE1EAF12DD00418386 /* dst.txt */,
+				7D768EAF1EAF12DD00418386 /* launcher.defines.h */,
+				7D768EA81EAF12D200418386 /* data_dest.c */,
+				7D768EA91EAF12D200418386 /* data_source.c */,
+				7D768EAA1EAF12D200418386 /* launcher.c */,
+				7D768EA51EAF12C400418386 /* compile.sh */,
+				7D768EA61EAF12C400418386 /* data_handler.c */,
 			);
 			path = Task_7_1;
 			sourceTree = "<group>";
@@ -119,7 +134,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7D5B76AA1EAE60DD00E17A70 /* main.c in Sources */,
+				7D768EAC1EAF12D200418386 /* data_source.c in Sources */,
+				7D768EAD1EAF12D200418386 /* launcher.c in Sources */,
+				7D768EA71EAF12C400418386 /* data_handler.c in Sources */,
+				7D768EAB1EAF12D200418386 /* data_dest.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -248,6 +266,7 @@
 				7D5B76AF1EAE60DD00E17A70 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
