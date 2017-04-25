@@ -316,9 +316,13 @@ int main(int argc, char ** argv) {
     }
     setupInterruptions();
     
+    int i = 0;
     // main cycle
     while (true) {
-        if (reload_flag) { reload(); }
+        if (reload_flag) {
+            reload_flag = false;
+            reload();
+        }
         
         int p, status;
         if (check_awake_flag) {
@@ -370,6 +374,11 @@ int main(int argc, char ** argv) {
             break;
         }
         
+        i++;
+        if (i == 1) {
+            reload_flag = true;
+            i++;
+        }
         if (!active_process_count && !reload_flag) {
             break;
         }

@@ -1,4 +1,3 @@
 /bin/echo test wait
 /bin/ls -la wait
-/bin/echo test1 wait
-/bin/sleep 1 wait
+/bin/sleep 10 respawn
